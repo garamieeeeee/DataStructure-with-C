@@ -1,6 +1,6 @@
 //덱 구현 (1차원 배열 사용, 원형 큐를 변형해서 만듦)
 
-#include "DEQUEUE.h"
+#include "Deque.h"
 
 void Error(char* message) {
 	fprintf(stderr, "%s\n", message);
