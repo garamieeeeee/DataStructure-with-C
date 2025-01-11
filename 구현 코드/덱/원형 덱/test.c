@@ -1,4 +1,4 @@
-#include "DEQUEUE.h"
+#include "Deque.h"
 
 int main() {
 	DequeType dq;
