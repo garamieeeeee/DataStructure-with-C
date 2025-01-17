@@ -1,3 +1,5 @@
+//단방향 연결리스트
+
 #include "SinglyLinkedList.h"
 
 void Error(char* message) {
