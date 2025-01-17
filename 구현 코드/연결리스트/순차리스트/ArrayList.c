@@ -1,3 +1,5 @@
+//1차원 배열로 구현한 순차리스트
+
 #include "ArrayList.h"
 
 void Error(char* message) {
