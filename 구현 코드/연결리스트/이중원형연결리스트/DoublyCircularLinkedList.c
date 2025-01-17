@@ -1,3 +1,5 @@
+//양방향(+원형) 연결리스트
+
 #include "DoublyCircularLinkedList.h"
 
 void Error(char* message) {
