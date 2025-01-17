@@ -1,5 +1,3 @@
-//Singly Linked List
-
 #include "SinglyLinkedList.h"
 
 void Error(char* message) {
@@ -106,7 +104,6 @@ void InsertFirst(ListNode** head, ElementType data) {
 	ListNode* newNode = CreateNode(data);
 
 	if (IsEmpty(*head)) { //리스트가 비었으면
-		printf("리스트가 비었습니다. 첫 노드가 됩니다.\n");
 		*head = newNode;
 		return;
 	}
@@ -122,7 +119,6 @@ void InsertLast(ListNode** head, ElementType data) {
 	ListNode* newNode = CreateNode(data);
 
 	if (IsEmpty(*head)) {//리스트가 비었으면
-		printf("리스트가 비었습니다. 첫 노드가 됩니다.\n");
 		*head = newNode;
 		return;
 	}
@@ -158,7 +154,6 @@ void InsertAt(ListNode** head, int index, ElementType data) {
 	////리스트가 비어있는 경우
 	if (IsEmpty(*head)) {
 		if (index == 0) {//리스트가 비었고, 0번째에 삽입하는 경우
-			printf("리스트가 비었습니다. 첫 노드가 됩니다.\n");
 			*head = newNode;
 		}
 		else {//리스트가 비었는데 index가 0이 아닌 경우
@@ -356,19 +351,25 @@ void Reverse(ListNode** head) {
 		return;
 	}
 
-	ListNode* p, * q, * r; //리스트의 노드를 따라갈 포인터 3개 생성
+	ListNode* prev = NULL; //prev: 순서를 바꿀 노드의 선행노드를 가리키는 포인터
+	ListNode* current = *head; //current: (역순으로 바꿀)현재 노드를 가리키는 포인터
+	ListNode* next = NULL; //next: 순서를 바꿀 노드의 다음 노드의 주소를 저장할 포인터
 
-	p = *head;
-	q = NULL;
-	while (p != NULL) {
-		r = q;
-		q = p;
-		p = p->link; //p는 처음부터 끝까지 순회하고, r은 q를, q는 p를 차례로 따라간다.
-		q->link = r; //q의 링크 방향을 반대로 바꾼다.
+	while (current != NULL) { //current는 리스트의 맨 첫노드부터 마지막 노드까지 차례로 순회함
+		next = current->link; //다음에 넘어갈 노드의 주소를 미리 저장해둠
+		current->link = prev; //현재 노드의 링크를 이전 노드로 연결(역순으로 바꾼다)
+		prev = current; //prev는 current를 따라간다.
+		current = next; //current는 다음노드로 이동
 	}
-	//p는 NULL에 도달, q는 역순으로 바뀐 리스트의 첫 노드를 가리키고, r은 q 다음 노드를 가리키게 됨
 
-	*head = q;
+	//리스트의 모든 노드가 역순으로 바뀜
+	//마지막으로 head 포인터만 바꿔주면 됨
+	//이제 head 포인터는 역순으로 바뀐 리스트의 맨 첫 노드(=기존 리스트의 마지막 노드)를 가리켜야 함
+
+	//while문이 끝나고나면, current는 마지막 노드를 지나 NULL을 가리키고
+	//prev는 current의 하나 앞, 즉 리스트의 맨 마지막 노드를 가리키는 상태
+
+	*head = prev;
 
 	return;
 }
@@ -392,16 +393,11 @@ void Clear(ListNode** head) {
 
 void PrintList(ListNode* head) {
 
-	//리스트가 비어있는지 검사
-	if (head == NULL) {
-		printf("리스트가 비어있어서 출력하지 않습니다.\n\n");
-		return;
-	}
-
 	ListNode* ptr;
 	ptr = head;
 
 	int i = 0;
+	printf("[ ");
 	while (ptr != NULL) {
 		printf("[%d] %d", i, ptr->data);
 		if (ptr->link != NULL) { //마지막 노드가 아닌 경우
@@ -410,5 +406,5 @@ void PrintList(ListNode* head) {
 		ptr = ptr->link;
 		i++;
 	}
-	printf("\n\n");
+	printf(" ]\n\n");
 }
