@@ -1,3 +1,5 @@
+//(단방향) 원형 연결리스트
+
 #include "CircularLinkedList.h"
 
 void Error(char* message) {
