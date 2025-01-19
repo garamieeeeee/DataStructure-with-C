@@ -1,5 +1,6 @@
-
 //arrayStack
+//스택 구조체를 생성할때, 스택의 초기 용량을 설정한다.
+//만약 스택이 꽉 찼는데 삽입할 경우, 용량을 2배로 늘리고 realloc한 후 삽입한다.
 
 #include "ArrayStack.h"
 
