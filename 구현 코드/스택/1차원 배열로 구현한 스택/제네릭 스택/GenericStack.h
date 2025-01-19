@@ -1,30 +1,27 @@
-
-#ifndef ARRAYSTACK_H
-#define ARRAYSTACK_H
+#ifndef GENERICSTACK_H
+#define GENERICSTACK_H
 
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef int ElementType;
+#include <string.h>
 
 typedef struct {
-	ElementType data;
+	void* data;
+	int elementSize;
 }Node;
 
 typedef struct {
-	int top;
 	int capacity;
+	int top;
 	Node* nodes;
 }StackType;
 
-void CreateStack(StackType** s, int capacity);
+void CreateStack(StackType** s, int elementSize);
 void DestroyStack(StackType** s);
-int IsEmpty(StackType* s);
+void Push(StackType* s, void* data);
+void* Pop(StackType* s);
+void* Peek(StackType* s);
 int IsFull(StackType* s);
-void Push(StackType* s, ElementType data);
-ElementType Pop(StackType* s);
-ElementType Peek(StackType* s);
-int GetSize(StackType* s);
-void ShowStack(StackType* s);
+int IsEmpty(StackType* s);
 
 #endif
