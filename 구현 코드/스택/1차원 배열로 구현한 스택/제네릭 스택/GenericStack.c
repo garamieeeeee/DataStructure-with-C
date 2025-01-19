@@ -1,7 +1,6 @@
-
 //똑같이 1차원 배열로 구현한 스택
 //스택 요소의 데이터 타입에 상관없이 사용할 수 있는 제네릭 스택 구현
-#include "GenericArrayStack.h"
+#include "GenericStack.h"
 
 void CreateStack(StackType** s, int elementSize) {
 	(*s) = (StackType*)malloc(sizeof(StackType));
