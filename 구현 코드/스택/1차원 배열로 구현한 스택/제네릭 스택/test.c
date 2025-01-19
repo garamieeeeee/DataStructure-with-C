@@ -1,4 +1,4 @@
-#include "GenericArrayStack.h"
+#include "GenericStack.h"
 
 int main() {
 
