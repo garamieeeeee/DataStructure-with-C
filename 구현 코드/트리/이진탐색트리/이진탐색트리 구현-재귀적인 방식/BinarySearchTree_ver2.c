@@ -1,3 +1,4 @@
+//재귀적인 방식으로 이진탐색트리 구현
 #include "BinarySearchTree_ver2.h"
 
 void Error(char* message) {
