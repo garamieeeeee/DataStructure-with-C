@@ -1,15 +1,44 @@
-#include "LinearQueue.h"
+#include "ArrayLinearQueue.h"
 
 void Error(char* message) {
 	fprintf(stderr, "%s\n", message);
 	exit(EXIT_FAILURE);
 }
 
-void InitQueue(QueueType* q) {
-	q->front = -1;
-	q->rear = -1;
+QueueType* CreateQueue() { //큐 구조체를 생성하고 초기화하여 반환
+	QueueType* q = (QueueType*)malloc(sizeof(QueueType));
+	if (!q) Error("memory allocation failed.");
+	q->front = q->rear = -1;
+	return q;
+}
 
-	return;
+int IsEmpty(QueueType* q) {
+	return (q->front == q->rear);
+}
+
+int IsFull(QueueType* q) {
+	return (q->rear == MAX_QUEUE_SIZE - 1);
+}
+
+void Enqueue(QueueType* q, ElementType data) {
+	if (IsFull(q)) Error("Queue is full.");
+	q->queue[++(q->rear)] = data;
+}
+
+ElementType Dequeue(QueueType* q) {
+	if (IsEmpty(q)) Error("Queue is empty.");
+	return (q->queue[++(q->front)]);
+}
+
+ElementType Peek(QueueType* q) {
+	if (IsEmpty(q)) Error("Queue is empty.");
+	return (q->queue[q->front]);
+}
+
+void DestroyQueue(QueueType** q) {
+	if (*q == NULL) return;
+	free(*q);
+	*q = NULL;
 }
 
 void PrintQueue(QueueType* q) {
@@ -19,37 +48,8 @@ void PrintQueue(QueueType* q) {
 			printf("[%d]  |", i);
 		}
 		else {
-			printf("[%d] %d| ", i, q->data[i]);
+			printf("[%d] %d| ", i, q->queue[i]);
 		}
 	}
 	printf("\n");
-	return;
-}
-
-int IsFull(QueueType* q) {
-	return (q->rear == MAX_QUEUE_SIZE - 1);
-}
-
-int IsEmpty(QueueType* q) {
-	return (q->front == q->rear);
-}
-
-void Enqueue(QueueType* q, element data) {
-	if (IsFull(q)) {
-		Error("Queue is Full\n");
-		return;
-	}
-
-	q->data[++(q->rear)] = data;
-
-	return;
-}
-
-element Dequeue(QueueType* q) {
-	if (IsEmpty(q)) {
-		Error("Queue is Empty\n");
-		return -1;
-	}
-
-	return (q->data[++(q->front)]);
 }
