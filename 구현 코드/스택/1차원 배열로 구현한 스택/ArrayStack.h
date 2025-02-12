@@ -1,30 +1,27 @@
-
 #ifndef ARRAYSTACK_H
-#define ARRAYSTACK_H
+#define ARRAY_STACK_H
 
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_STACK_SIZE 100
+
 typedef int ElementType;
 
 typedef struct {
-	ElementType data;
-}Node;
-
-typedef struct {
+	ElementType stack[MAX_STACK_SIZE];
 	int top;
-	int capacity;
-	Node* nodes;
 }StackType;
 
-void CreateStack(StackType** s, int capacity);
-void DestroyStack(StackType** s);
+void Error(char* message);
+StackType* CreateStack();
 int IsEmpty(StackType* s);
 int IsFull(StackType* s);
 void Push(StackType* s, ElementType data);
 ElementType Pop(StackType* s);
 ElementType Peek(StackType* s);
+void DestroyStack(StackType** s);
 int GetSize(StackType* s);
-void ShowStack(StackType* s);
+void PrintStack(StackType* s);
 
 #endif
