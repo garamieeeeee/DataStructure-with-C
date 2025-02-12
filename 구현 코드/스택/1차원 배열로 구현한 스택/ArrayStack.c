@@ -1,41 +1,16 @@
-//arrayStack
-//스택 구조체를 생성할때, 스택의 초기 용량을 설정한다.
-//만약 스택이 꽉 찼는데 삽입할 경우, 용량을 2배로 늘리고 realloc한 후 삽입한다.
-
 #include "ArrayStack.h"
 
-void CreateStack(StackType** s, int capacity) {
-
-	//create Stack
-	(*s) = (StackType*)malloc(sizeof(StackType));
-	if ((*s) == NULL) {
-		fprintf(stderr, "Memory allocation failed\n");
-		exit(1);
-	}
-
-	//allocate memory for Nodes
-	(*s)->nodes = (Node*)malloc(capacity * sizeof(Node));
-	if ((*s)->nodes == NULL) {
-		fprintf(stderr, "Memory allocation failed\n");
-		exit(1);
-	}
-
-	//initialize
-	(*s)->capacity = capacity;
-	(*s)->top = -1;
+void Error(char* message) {
+	fprintf(stderr, "%s\n", message);
+	exit(EXIT_FAILURE);
 }
 
-void DestroyStack(StackType** s) {
+StackType* CreateStack() { //스택 구조체 생성하고 초기화하여 반환함
+	StackType* s = (StackType*)malloc(sizeof(StackType));
+	if (!s) Error("memory allocation failed.");
+	s->top = -1;
 
-	//free allocated nodes
-	free((*s)->nodes);
-	(*s)->nodes = NULL; //메모리를 해제한 후 포인터를 NULL로 설정하는 습관을 들이면, 이후 이중 해제(Bug)를 방지할 수 있다.
-
-	//free allocated stack
-	free(*s);
-	(*s) = NULL;
-
-	return;
+	return s;
 }
 
 int IsEmpty(StackType* s) {
@@ -43,49 +18,37 @@ int IsEmpty(StackType* s) {
 }
 
 int IsFull(StackType* s) {
-	return (s->top == s->capacity-1);
+	return (s->top == MAX_STACK_SIZE - 1);
 }
 
 void Push(StackType* s, ElementType data) {
-	if (IsFull(s)) {
-		s->capacity *= 2;
-		s->nodes = (Node*)realloc(s->nodes, s->capacity * sizeof(Node));
-		if (s->nodes == NULL) {
-			fprintf(stderr, "Memory reallocation failed\n");
-			exit(1);
-		}
-	}
-
-	s->nodes[++(s->top)].data = data;
+	if (IsFull(s)) Error("Stack is full.");
+	s->stack[++(s->top)] = data;
 }
 
 ElementType Pop(StackType* s) {
-	if (IsEmpty(s)) {
-		fprintf(stderr, "Stack is empty\n");
-		exit(1);
-	}
-
-	return s->nodes[(s->top)--].data;
+	if (IsEmpty(s)) Error("Stack is empty.");
+	return s->stack[(s->top)--];
 }
 
 ElementType Peek(StackType* s) {
-	if (IsEmpty(s)) {
-		fprintf(stderr, "Stack is empty\n");
-		exit(1);
-	}
+	if (IsEmpty(s)) Error("Stack is empty.");
+	return s->stack[s->top];
+}
 
-	return s->nodes[s->top].data;
+void DestroyStack(StackType** s) {
+	if (*s == NULL) return;
+	free(*s);
+	*s = NULL;
 }
 
 int GetSize(StackType* s) {
 	return (s->top + 1);
 }
 
-void ShowStack(StackType* s) {
-	printf("Stack: \n");
-	for (int i = s->top; i >= 0 ; i--) {
-		printf("[%d]: %d\n", i, s->nodes[i].data);
+void PrintStack(StackType* s) {
+	for (int i = s->top; i >= 0; i--) {
+		printf("[%d] %d\n", i, s->stack[i]);
 	}
-
-	return;
+	printf("\n");
 }
