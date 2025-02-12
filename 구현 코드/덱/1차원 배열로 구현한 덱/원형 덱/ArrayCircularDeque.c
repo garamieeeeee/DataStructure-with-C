@@ -1,17 +1,17 @@
 //덱 구현 (1차원 배열 사용, 원형 큐를 변형해서 만듦)
 
-#include "Deque.h"
+#include "ArrayCircularDeque.h"
 
 void Error(char* message) {
 	fprintf(stderr, "%s\n", message);
 	exit(EXIT_FAILURE);
 }
 
-void InitDeque(DequeType* dq) {
-	dq->front = 0;
-	dq->rear = 0;
-
-	return;
+DequeType* CreateDeque() {
+	DequeType* dq = (DequeType*)malloc(sizeof(DequeType));
+	if (!dq) Error("memory allocation failed.");
+	dq->front = dq->rear = 0;
+	return dq;
 }
 
 int IsEmpty(DequeType* dq) {
@@ -28,77 +28,53 @@ void PrintDequeue(DequeType* dq) {
 		int i = dq->front;
 		do {
 			i = (i + 1) % MAX_QUEUE_SIZE;
-			printf("[%d] %d | ", i, dq->data[i]);
+			printf("[%d] %d | ", i, dq->deque[i]);
 			if (i == dq->rear) {
 				break;
 			}
 		} while (i != dq->front);
 	}
 	printf("\n");
-
-	return;
 }
 
-void AddRear(DequeType* dq, element data) {
-	if (IsFull(dq)) {
-		Error("DEQUE is Full");
-		return;
-	}
-
+void AddRear(DequeType* dq, ElementType data) {
+	if (IsFull(dq)) Error("Deque is Full.");
 	dq->rear = (dq->rear + 1) % MAX_QUEUE_SIZE;
-	dq->data[dq->rear] = data;
-
-	return;
+	dq->deque[dq->rear] = data;
 }
 
-element DeleteFront(DequeType* dq) {
-	if (IsEmpty(dq)) {
-		Error("DEQUE is Empty");
-		return -1;
-	}
-
+ElementType DeleteFront(DequeType* dq) {
+	if (IsEmpty(dq)) Error("Deque is Empty.");
 	dq->front = (dq->front + 1) % MAX_QUEUE_SIZE;
-	return dq->data[dq->front];
+	return dq->deque[dq->front];
 }
 
-element GetFront(DequeType* dq) {
-	if (IsEmpty(dq)) {
-		Error("DEQUE is Empty");
-		return -1;
-	}
-
-	return dq->data[(dq->front + 1) % MAX_QUEUE_SIZE];
+ElementType GetFront(DequeType* dq) {
+	if (IsEmpty(dq)) Error("Deque is Empty.");
+	return dq->deque[(dq->front + 1) % MAX_QUEUE_SIZE];
 }
 
-void AddFront(DequeType* dq, element data) {
-	if (IsFull(dq)) {
-		Error("DEQUE is Full");
-		return;
-	}
-
-	dq->data[dq->front] = data;
+void AddFront(DequeType* dq, ElementType data) {
+	if (IsFull(dq)) Error("Deque is Full.");
+	dq->deque[dq->front] = data;
 	dq->front = (dq->front - 1 + MAX_QUEUE_SIZE) % MAX_QUEUE_SIZE;
-
 	return;
 }
 
-element DeleteRear(DequeType* dq) {
-	if (IsEmpty(dq)) {
-		Error("DEQUE is Empty");
-		return -1;
-	}
-
+ElementType DeleteRear(DequeType* dq) {
+	if (IsEmpty(dq)) Error("Deque is Empty.");
 	int prev = dq->rear;
 	dq->rear = (dq->rear - 1 + MAX_QUEUE_SIZE) % MAX_QUEUE_SIZE;
-
-	return dq->data[prev];
+	return dq->deque[prev];
 }
 
-element GetRear(DequeType* dq) {
-	if (IsEmpty(dq)) {
-		Error("DEQUE is Empty");
-		return -1;
-	}
+ElementType GetRear(DequeType* dq) {
+	if (IsEmpty(dq)) Error("Deque is Empty.");
+	return dq->deque[dq->rear];
+}
 
-	return dq->data[dq->rear];
+void DestroyDeque(DequeType** dq) {
+	if (*dq == NULL) return;
+	free(*dq);
+	*dq = NULL;
 }
