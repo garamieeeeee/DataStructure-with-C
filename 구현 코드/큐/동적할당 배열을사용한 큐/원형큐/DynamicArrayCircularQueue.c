@@ -1,3 +1,6 @@
+//큐 구조체를 생성할때, 큐의 초기 용량을 설정한다.
+//만약 큐가 꽉 찼는데 삽입할 경우, 현재 용량의 2배인 큐를 새로 만들어 기존 큐의 요소들을 재배치한다
+
 #include"DynamicArrayCircularQueue.h"
 
 void Error(char* message) {
