@@ -1,41 +1,31 @@
 #include "ArrayStack.h"
 
-int main() {
-	StackType* s = NULL;
+void test() {
+	StackType* s = CreateStack();
 
-	CreateStack(&s, 5);
+	printf("10 삽입\n"); Push(s, 10);
+	printf("20 삽입\n"); Push(s, 20);
+	printf("30 삽입\n"); Push(s, 30);
+	printf("40 삽입\n"); Push(s, 40);
+	printf("50 삽입\n"); Push(s, 50);
+	printf("60 삽입\n"); Push(s, 60);
+	printf("\n");
 
-	Push(s, 10);
-	Push(s, 20);
-	Push(s, 30);
-	Push(s, 40);
-	Push(s, 50);
-	Push(s, 60);
+	printf("print stack: \n"); PrintStack(s);
+	printf("stack size: %d\n", GetSize(s)); printf("\n");
 
-	printf("Capacity: %d, Size: %d, Top: %d\n\n", s->capacity, GetSize(s), Peek(s));
-
-	printf("Show Stack..\n");
-	ShowStack(s);
-
-	while (1) {
-		if (IsEmpty(s)) {
-			break;
-		}
-
-		printf("Popped: %d\n", Pop(s));
-
-		if (!IsEmpty(s)) {
-			printf("Current Top: %d\n", Peek(s));
-		}
-		else {
-			printf("Stack is Empty.\n");
-		}
+	while (!IsEmpty(s)) {
+		ElementType data = Pop(s);
+		printf("Popped: %d\n", data);
 	}
+	printf("Stack is Empty.\n");
 
+	printf("스택 삭제\n");
 	DestroyStack(&s);
+	if (s) printf("스택이 삭제되지 않았습니다.\n");
+}
 
-	printf("스택 삭제 확인: %d\n", s);
-
-
+int main() {
+	test();
 	return 0;
 }
