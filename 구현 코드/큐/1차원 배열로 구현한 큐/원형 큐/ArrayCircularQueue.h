@@ -1,26 +1,26 @@
-#ifndef CIRCULARQUEUE_H
-#define CIRCULARQUEUE_H
+#ifndef ARRAYCIRCULARQUEUE_H
+#define ARRAYCIRCULARQUEUE_H
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #define MAX_QUEUE_SIZE 5
 
-typedef int element;
+typedef int ElementType;
 
 typedef struct {
-	int front;
-	int rear;
-	element data[MAX_QUEUE_SIZE];
+	ElementType queue[MAX_QUEUE_SIZE];
+	int front, rear;
 }QueueType;
 
 void Error(char* message);
-void InitQueue(QueueType* q);
-int IsFull(QueueType* q);
+QueueType* CreateQueue();
 int IsEmpty(QueueType* q);
+int IsFull(QueueType* q);
+void Enqueue(QueueType* q, ElementType data);
+ElementType Dequeue(QueueType* q);
+ElementType Peek(QueueType* q);
+void DestroyQueue(QueueType** q);
 void PrintQueue(QueueType* q);
-void Enqueue(QueueType* q, element data);
-element Dequeue(QueueType* q);
-element Peek(QueueType* q);
 
 #endif
