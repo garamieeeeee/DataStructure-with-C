@@ -1,3 +1,5 @@
+//큐 구조체를 생성할때, 큐의 초기 용량을 설정한다.
+//만약 큐가 꽉 찼는데 삽입할 경우, 용량을 2배로 늘리고 realloc한 후 삽입한다.
 #include "DynamicArrayLinearQueue.h"
 
 void Error(char* message) {
