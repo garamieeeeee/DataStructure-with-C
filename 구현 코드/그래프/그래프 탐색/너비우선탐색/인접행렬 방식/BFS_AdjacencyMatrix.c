@@ -1,6 +1,6 @@
 //무방향 그래프, 인접행렬 방식으로 구현
 //2차원 배열 사용
-//BFS 알고리즘
+//BFS 알고리즘(원형 큐 사용)
 #include "BFS_AdjacencyMatrix.h"
 
 void Error(char* message) {
