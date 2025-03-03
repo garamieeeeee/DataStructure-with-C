@@ -1,5 +1,6 @@
 //무방향 그래프, 인접행렬 방식으로 구현
 //동적 2차원 배열 사용
+//정점 개수 제한 없음
 #include "Dynamic_AdjacencyMatrix_graph.h"
 
 void Error(char* message) {
