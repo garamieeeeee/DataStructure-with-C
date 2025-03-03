@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//정점 개수 제한 없음
 typedef struct {//그래프 구조체
 	int totalVertices;//정점의 개수
 	int** adjMat;
