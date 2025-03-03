@@ -21,5 +21,6 @@ void InsertEdge(GraphType* g, int u, int v);
 void Print_adjMat(GraphType* g);
 void DestroyGraph(GraphType** g);
 void Init();
+void DFS_mat(GraphType* g, int v);
 
 #endif
