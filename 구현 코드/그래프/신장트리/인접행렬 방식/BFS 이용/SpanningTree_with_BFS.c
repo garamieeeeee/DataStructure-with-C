@@ -122,7 +122,19 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void BFS_mat(GraphType* g, int v) {//인접 행렬로 표현된 그래프에 대한 너비 우선 탐색(시작정점: v)
+void Build_SpanningTree(GraphType* spanningTree) {
+	for (int i = 0; i < spanningTree->totalVertices; i++) {
+		if (parent[i] != -1) { //부모노드가 존재하는 경우만
+			InsertEdge(spanningTree, i, parent[i]); //parent[w]는 w의 부모노드, 즉 간선 (w, parent[w]) 사이에 간선이 존재
+		}
+	}
+}
+
+GraphType* BFS_mat(GraphType* g, int v) {//BFS 변형: BFS를 수행하면서 사용한 간선들을 모아 스패닝트리를 만든다. 정점 w의 부모노드를 parent[w]에 기록해 간선 정보를 저장함 
+	
+	GraphType* spanningTree = CreateGraph(); //스패닝 트리
+	spanningTree->totalVertices = g->totalVertices;
+
 	visited[v] = TRUE; //정점 v 방문 표시
 	printf("정점 %d -> ", v); //방문한 정점 출력
 	parent[v] = -1; //시작정점의 부모노드는 없다.(-1)
@@ -142,18 +154,15 @@ void BFS_mat(GraphType* g, int v) {//인접 행렬로 표현된 그래프에 대
 	}
 	//사용이 끝나면 큐 삭제
 	DestroyQueue(&q);
-}
-
-void Print_SpanningTree(GraphType* g) {
-	for (int i = 0; i < g->totalVertices; i++) {
-		if (parent[i] != -1) { //부모노드가 존재하는 경우만
-			printf("(%d, %d)\n", parent[i], i);
-		}
-	}
+	//스패닝 트리를 만들어 반환
+	Build_SpanningTree(spanningTree);
+	return spanningTree;
 }
 
 int main() {
 	GraphType* g = CreateGraph();
+	GraphType* spanningTree = CreateGraph();
+
 	//정점 삽입(0,1,2,3,4)
 	for (int i = 0; i < 5; i++) {
 		InsertVertex(g, i);
@@ -180,14 +189,16 @@ int main() {
 	Init(); //visited 배열 FALSE로 초기화
 	for (int i = 0; i < MAX_VERTICES; i++) //parent 배열 -1로 초기화
 		parent[i] = -1;
+
 	printf("<< 너비 우선 탐색 >>\n");
-	BFS_mat(g, 0);//0을 시작정점으로 깊이 우선 탐색
+	spanningTree = BFS_mat(g, 0);//0을 시작정점으로 깊이 우선 탐색, 반환값으로 g의 신장트리를 받음
 	printf("\n");
-	printf("신장트리 간선들 출력: \n");
-	Print_SpanningTree(g);
+	printf("그래프 g의 신장트리 출력:\n");
+	Print_adjMat(spanningTree);
 
 	//그래프 삭제
 	DestroyGraph(&g);
+	DestroyGraph(&spanningTree);
 
 	return 0;
 }
