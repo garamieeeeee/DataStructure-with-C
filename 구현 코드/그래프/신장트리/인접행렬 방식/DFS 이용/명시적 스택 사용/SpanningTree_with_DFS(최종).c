@@ -117,7 +117,7 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void Build_SpanninTree(GraphType* spanningTree) { //스패닝 트리의 간선들을 저장한 배열을 사용해 스패닝트리를 구성함
+void Build_SpanningTree(GraphType* spanningTree) { //스패닝 트리의 간선들을 저장한 배열을 사용해 스패닝트리를 구성함
 	for (int i = 0; i < EdgeCount; i++) {
 		Edge e = edges[i];
 		InsertEdge(spanningTree, e.start, e.end);
@@ -151,7 +151,7 @@ GraphType* DFS_mat_iterative(GraphType* g, int v) {//DFS 변형: DFS를 수행�
 	//스택 사용이 끝나면 삭제
 	DestroyStack(&s);
 	//스패닝트리 만들고 반환
-	Build_SpanninTree(spanningTree);
+	Build_SpanningTree(spanningTree);
 	return spanningTree;
 }
 
