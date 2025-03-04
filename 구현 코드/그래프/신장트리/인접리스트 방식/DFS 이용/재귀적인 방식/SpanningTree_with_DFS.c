@@ -1,6 +1,6 @@
 //무방향 그래프, 인접 리스트 방식으로 구현
 //1차원 배열 + 연결리스트 사용
-//DFS 알고리즘(재귀적인 방식)
+//DFS를 수행하면서 사용한 간선들을 모아 스패닝트리를 만든다
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +23,7 @@ typedef struct {
 }Edge;
 
 int visited[MAX_VERTICES]; //정점 방문 표시할 배열
-Edge spanningTree[MAX_VERTICES]; //신장트리 간선들을 저장할 배열
+Edge edges[MAX_VERTICES]; //신장트리 간선들을 저장할 배열
 int EdgeCount = 0; //저장된 간선의 개수
 
 void Error(char* message) {
@@ -101,7 +101,7 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void DFS_list(GraphType* g, int v) {//인접 리스트로 표현된 그래프에 대한 깊이 우선 탐색(시작정점: v)
+void DFS_list(GraphType* g, int v) {//DFS 변형: DFS를 수행하면서 사용한 간선들을 edges에 저장한다
 	visited[v] = TRUE; //정점 v의 방문 표시
 	printf("정점 %d -> ", v); //방문한 정점 출력
 	Edge e;
@@ -110,17 +110,20 @@ void DFS_list(GraphType* g, int v) {//인접 리스트로 표현된 그래프에
 	for (w = g->adjList[v]; w != NULL; w = w->link) {//v의 인접 정점 탐색(연결리스트 순회)
 		if (!visited[w->vertex]) { //인접정점인 w를 아직 방문하지 않았다면
 			e.end = w->vertex;
-			spanningTree[EdgeCount++] = e; //간선 (v, w) 저장
+			edges[EdgeCount++] = e; //간선 (v, w) 저장
 			DFS_list(g, w->vertex);//정점 w에서부터 DFS 다시 시작(재귀함수)
 		}
 	}
 }
 
-void Print_SpanninTree() { //스패닝 트리의 간선들을 출력하는 함수
+GraphType* Build_SpanningTree(GraphType* g) { //edges[]를 이용하여 그래프 g의 스패닝 트리를 만들어 반환한다.
+	GraphType* spanningTree = CreateGraph();
+	spanningTree->totalVertices = g->totalVertices;
 	for (int i = 0; i < EdgeCount; i++) {
-		printf("(%d, %d)\n", spanningTree[i].start, spanningTree[i].end);
+		Edge e = edges[i];
+		InsertEdge(spanningTree, e.start, e.end);
 	}
-	printf("\n");
+	return spanningTree;
 }
 
 int main() {
@@ -152,11 +155,13 @@ int main() {
 	printf("<< 깊이 우선 탐색 >>\n");
 	DFS_list(g, 0); //0을 시작정점으로 깊이 우선 탐색
 	printf("\n");
-	printf("신장트리 간선들 출력:\n");
-	Print_SpanninTree();
+	printf("그래프 g의 신장트리:\n");
+	GraphType* spanningTree = Build_SpanningTree(g);
+	Print_adjList(spanningTree);
 
 	//그래프 삭제
 	DestroyGraph(&g);
+	DestroyGraph(&spanningTree);
 
 	return 0;
 }
