@@ -79,7 +79,7 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void Build_SpanninTree(GraphType* spanningTree) { //스패닝 트리를 구성하는 함수
+void Build_SpanningTree(GraphType* spanningTree) { //스패닝 트리를 구성하는 함수
 	for (int i = 0; i < EdgeCount; i++) {
 		Edge e = edges[i];
 		InsertEdge(spanningTree, e.start, e.end);
@@ -102,7 +102,7 @@ GraphType* DFS_mat(GraphType* g, int v) {//DFS 변형: 깊이우선탐색을 하
 			DFS_mat(g, w); //정점 w에서부터 DFS 다시 시작(재귀함수)
 		}
 	}
-	Build_SpanninTree(spanningTree); //스패닝트리 만들어 반환
+	Build_SpanningTree(spanningTree); //스패닝트리 만들어 반환
 	return spanningTree;
 }
 
