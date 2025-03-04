@@ -117,7 +117,17 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void DFS_mat_iterative(GraphType* g, int v) {//인접 행렬로 표현된 그래프에 대한 깊이 우선 탐색(시작정점: v)
+void Build_SpanninTree(GraphType* mst) { //스패닝 트리의 간선들을 저장한 배열을 사용해 스패닝트리를 구성함
+	for (int i = 0; i < EdgeCount; i++) {
+		Edge e = spanningTree[i];
+		InsertEdge(mst, e.start, e.end);
+	}
+}
+
+GraphType* DFS_mat_iterative(GraphType* g, int v) {//DFS 변형: DFS를 수행하면서 사용한 간선들을 모아 신장트리를 만들고 반환함
+	GraphType* mst = CreateGraph();//반환할 mst
+	mst->totalVertices = g->totalVertices;
+
 	StackType* s = CreateStack(); //정점들을 저장할 스택 생성
 	Push(s, v); //시작정점인 v를 스택에 우선 삽입
 	while (!IsEmpty(s)) { //스택이 빌때까지 반복
@@ -132,25 +142,23 @@ void DFS_mat_iterative(GraphType* g, int v) {//인접 행렬로 표현된 그래
 			for (w = 0; w < g->totalVertices; w++) {//꺼낸 정점의 인접 정점 탐색
 				if (g->adjMat[popped_vertex][w] && !visited[w]) //인접 정점w를 아직 방문하지 않았다면
 					e.end = w;
-					Push(s, w); //스택에 삽입(꺼낸 정점의 모든 인접 정점을 스택에 삽입한다)
+				Push(s, w); //스택에 삽입(꺼낸 정점의 모든 인접 정점을 스택에 삽입한다)
 			}
-			if(e.end != -1)
+			if (e.end != -1)
 				spanningTree[EdgeCount++] = e; //간선 (popped_vertex, w) 저장
 		}
 	}
 	//스택 사용이 끝나면 삭제
 	DestroyStack(&s);
-}
-
-void Print_SpanninTree() { //스패닝 트리의 간선들을 출력하는 함수
-	for (int i = 0; i < EdgeCount; i++) {
-		printf("(%d, %d)\n", spanningTree[i].start, spanningTree[i].end);
-	}
-	printf("\n");
+	//스패닝트리 만들고 반환
+	Build_SpanninTree(mst);
+	return mst;
 }
 
 int main() {
 	GraphType* g = CreateGraph();
+	GraphType* mst;
+
 	//정점 삽입(0,1,2,3,4)
 	for (int i = 0; i < 5; i++) {
 		InsertVertex(g, i);
@@ -176,13 +184,14 @@ int main() {
 	//dfs
 	Init(); //visited 배열 FALSE로 초기화
 	printf("<< 깊이 우선 탐색 >>\n");
-	DFS_mat_iterative(g, 0);//0을 시작정점으로 깊이 우선 탐색
+	mst = DFS_mat_iterative(g, 0);//0을 시작정점으로 깊이 우선 탐색, 그래프 g의 신장트리를 반환받음
 	printf("\n");
-	printf("신장트리 간선들 출력:\n");
-	Print_SpanninTree();
+	printf("그래프 g의 신장트리: \n");
+	Print_adjMat(mst);
 
 	//그래프 삭제
 	DestroyGraph(&g);
+	DestroyGraph(&mst);
 
 	return 0;
 }
