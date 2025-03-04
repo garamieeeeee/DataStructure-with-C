@@ -1,6 +1,6 @@
 //무방향 그래프, 인접행렬 방식
 //2차원 배열 사용
-//DFS 알고리즘(명시적 스택 사용)
+//DFS 알고리즘(명시적 스택 사용)에서 사용된 간선들을 모아 스패닝 트리를 만듦
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +26,7 @@ typedef struct {
 }Edge;
 
 int visited[MAX_VERTICES]; //정점 방문 표시할 배열
-Edge spanningTree[MAX_VERTICES]; //신장트리 간선들을 저장할 배열
+Edge edges[MAX_VERTICES]; //신장트리 간선들을 저장할 배열
 int EdgeCount = 0; //저장된 간선의 개수
 
 void Error(char* message) {
@@ -117,16 +117,16 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void Build_SpanninTree(GraphType* mst) { //스패닝 트리의 간선들을 저장한 배열을 사용해 스패닝트리를 구성함
+void Build_SpanninTree(GraphType* spanningTree) { //스패닝 트리의 간선들을 저장한 배열을 사용해 스패닝트리를 구성함
 	for (int i = 0; i < EdgeCount; i++) {
-		Edge e = spanningTree[i];
-		InsertEdge(mst, e.start, e.end);
+		Edge e = edges[i];
+		InsertEdge(spanningTree, e.start, e.end);
 	}
 }
 
 GraphType* DFS_mat_iterative(GraphType* g, int v) {//DFS 변형: DFS를 수행하면서 사용한 간선들을 모아 신장트리를 만들고 반환함
-	GraphType* mst = CreateGraph();//반환할 mst
-	mst->totalVertices = g->totalVertices;
+	GraphType* spanningTree = CreateGraph();//반환할 스패닝트리
+	spanningTree->totalVertices = g->totalVertices;
 
 	StackType* s = CreateStack(); //정점들을 저장할 스택 생성
 	Push(s, v); //시작정점인 v를 스택에 우선 삽입
@@ -145,19 +145,19 @@ GraphType* DFS_mat_iterative(GraphType* g, int v) {//DFS 변형: DFS를 수행�
 				Push(s, w); //스택에 삽입(꺼낸 정점의 모든 인접 정점을 스택에 삽입한다)
 			}
 			if (e.end != -1)
-				spanningTree[EdgeCount++] = e; //간선 (popped_vertex, w) 저장
+				edges[EdgeCount++] = e; //간선 (popped_vertex, w) 저장
 		}
 	}
 	//스택 사용이 끝나면 삭제
 	DestroyStack(&s);
 	//스패닝트리 만들고 반환
-	Build_SpanninTree(mst);
-	return mst;
+	Build_SpanninTree(spanningTree);
+	return spanningTree;
 }
 
 int main() {
 	GraphType* g = CreateGraph();
-	GraphType* mst;
+	GraphType* spanningTree;
 
 	//정점 삽입(0,1,2,3,4)
 	for (int i = 0; i < 5; i++) {
@@ -184,14 +184,14 @@ int main() {
 	//dfs
 	Init(); //visited 배열 FALSE로 초기화
 	printf("<< 깊이 우선 탐색 >>\n");
-	mst = DFS_mat_iterative(g, 0);//0을 시작정점으로 깊이 우선 탐색, 그래프 g의 신장트리를 반환받음
+	spanningTree = DFS_mat_iterative(g, 0);//0을 시작정점으로 깊이 우선 탐색, 그래프 g의 신장트리를 반환받음
 	printf("\n");
 	printf("그래프 g의 신장트리: \n");
-	Print_adjMat(mst);
+	Print_adjMat(spanningTree);
 
 	//그래프 삭제
 	DestroyGraph(&g);
-	DestroyGraph(&mst);
+	DestroyGraph(&spanningTree);
 
 	return 0;
 }
