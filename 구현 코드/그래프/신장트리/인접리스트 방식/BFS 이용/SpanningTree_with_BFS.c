@@ -1,6 +1,6 @@
-//무방향 그래프, 인접 리스트 방식으로 구현
-//1차원 배열 + 연결리스트 사용
-//BFS 알고리즘
+//무방향 그래프, 인접행렬 방식으로 구현
+//2차원 배열 사용
+//BFS를 수행하면서 사용한 간선들을 모아서 스패닝트리를 만든다
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,14 +10,9 @@
 #define MAX_VERTICES 100 //정점 최대 개수
 #define MAX_QUEUE_SIZE 100
 
-typedef struct GraphNode {
-	int vertex; //정점 번호
-	struct GraphNode* link;
-}GraphNode; //(정점)연결리스트의 노드 구조체
-
 typedef struct {//그래프 구조체
-	int totalVertices;
-	GraphNode* adjList[MAX_VERTICES]; //연결리스트를 가리키는 포인터 배열
+	int totalVertices;//정점의 개수
+	int adjMat[MAX_VERTICES][MAX_VERTICES];//인접 행렬
 }GraphType;
 
 typedef int ElementType;
@@ -73,8 +68,10 @@ GraphType* CreateGraph() {
 	if (!g) Error("memory allocation failed.");
 	//그래프 초기화
 	g->totalVertices = 0;
-	for (int i = 0; i < MAX_VERTICES; i++) {
-		g->adjList[i] = NULL;
+	for (int r = 0; r < MAX_VERTICES; r++) {
+		for (int c = 0; c < MAX_VERTICES; c++) {
+			g->adjMat[r][c] = 0;
+		}
 	}
 	return g;
 }
@@ -91,53 +88,30 @@ void InsertVertex(GraphType* g, int v) { //정점 삽입
 	g->totalVertices++;
 }
 
-void InsertEdge(GraphType* g, int u, int v) {//간선 삽입: v를 u의 인접리스트에 삽입한다
+void InsertEdge(GraphType* g, int u, int v) {//간선 (u,v) 삽입
 	if (u >= g->totalVertices || v >= g->totalVertices) {
 		//정점 번호 에러: 간선을 삽입하지 않고 종료
 		fprintf(stderr, "vertex number error.\n");
 		return;
 	}
-	//새로운 노드 생성:v 노드를 생성하여 u의 인접리스트에 추가한다.
-	//위치는 상관이 없으므로, 삽입을 편하게 하기 위하여 리스트의 맨 앞에 삽입한다.
-	GraphNode* node1 = (GraphNode*)malloc(sizeof(GraphNode));
-	if (!node1) Error("memory allocation failed.");
-	node1->vertex = v;
-	//노드 삽입
-	node1->link = g->adjList[u];
-	g->adjList[u] = node1;
-
-	//무방향 그래프이므로 반대 방향도 추가:u 노드를 생성하여 v의 인접리스트에 삽입한다
-	//방향 그래프라면 이 과정은 생략한다.
-	GraphNode* node2 = (GraphNode*)malloc(sizeof(GraphNode));
-	if (!node2) Error("memory allocation failed.");
-	node2->vertex = u;
-	node2->link = g->adjList[v];
-	g->adjList[v] = node2;
+	//간선 삽입
+	//방향 그래프의 경우라면 g->adjMat[start][end]에만 1을 삽입한다
+	g->adjMat[u][v] = 1;
+	g->adjMat[v][u] = 1;
 }
 
-void Print_adjList(GraphType* g) {
-	for (int i = 0; i < g->totalVertices; i++) {//각 정점의 연결리스트들을 출력한다.
-		GraphNode* p = g->adjList[i];//p: 정점 i의 연결리스트를 순회한다
-		printf("정점 %d의 인접 리스트 ", i);
-		while (p != NULL) {
-			printf("-> %d ", p->vertex);
-			p = p->link;
+void Print_adjMat(GraphType* g) {//정점 개수만큼의 사이즈(n*n)로 인접행렬을 출력한다
+	for (int r = 0; r < g->totalVertices; r++) {
+		for (int c = 0; c < g->totalVertices; c++) {
+			printf("%2d ", g->adjMat[r][c]);
 		}
 		printf("\n");
 	}
 	printf("\n");
 }
 
-void DestroyGraph(GraphType** g) {
+void DestroyGraph(GraphType** g) {//그래프 메모리 해제
 	if (*g == NULL) return;
-	for (int i = 0; i < (*g)->totalVertices; i++) {
-		GraphNode* temp;
-		while ((*g)->adjList[i] != NULL) {
-			temp = (*g)->adjList[i];
-			(*g)->adjList[i] = (*g)->adjList[i]->link;
-			free(temp);
-		}
-	}
 	free(*g);
 	*g = NULL;
 }
@@ -148,34 +122,37 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void BFS_list(GraphType* g, int v) {//인접 리스트로 표현된 그래프에 대한 너비 우선 탐색(시작정점: v)
+void BFS_mat(GraphType* g, int v) {//BFS 변형: BFS를 수행하면서 사용한 간선들을 저장한다.(만약 v의 인접정점이 w라면 parent[w] = v를 저장)
 	visited[v] = TRUE; //정점 v 방문 표시
 	printf("정점 %d -> ", v); //방문한 정점 출력
 	parent[v] = -1; //시작정점의 부모노드는 없다.(-1)
 	QueueType* q = CreateQueue(); //정점들을 저장할 큐 생성
-	Enqueue(q, v); //시작 정점인 v를 우선 큐에 삽입해놓고 시작
+	Enqueue(q, v); //시작 정점을 큐에 삽입해놓고 시작
 	while (!IsEmpty(q)) {//큐가 빌때까지 반복
 		int popped_vertex = Dequeue(q); //큐에서 정점을 하나 꺼내서
-		GraphNode* w; //정점 w
-		for (w = g->adjList[popped_vertex]; w != NULL; w = w->link) { //꺼낸 정점의 인접 정점들을 탐색한다(연결리스트 순회)
-			if (!visited[w->vertex]) { //인접정점 w를 방문하지 않았다면
-				visited[w->vertex] = TRUE; //w 방문 표시하고
-				printf("정점 %d -> ", w->vertex);
-				Enqueue(q, w->vertex); //방문한 정점을 큐에 삽입(큐에서 꺼낸 정점의 인접 정점들을 모두 방문하고 큐에 삽입한다)
-				parent[w->vertex] = popped_vertex; //방문한 정점의 부모노드를 기록해 둔다(큐에서 꺼낸 노드가 부모노드)
+		int w; //정점 w
+		for (w = 0; w < g->totalVertices; w++) { //꺼낸 정점의 인접정점 탐색
+			if (g->adjMat[popped_vertex][w] && !visited[w]) { //인접정점 w가 아직 방문되지 않았다면
+				visited[w] = TRUE; //방문표시 후
+				printf("정점 %d -> ", w);
+				Enqueue(q, w); //방문한 정점을 큐에 삽입(큐에서 꺼낸 정점의 인접 정점들을 모두 방문하고 큐에 삽입한다)
+				parent[w] = popped_vertex; //방문한 정점의 부모노드를 기록해 둔다(큐에서 꺼낸 노드가 부모노드)
 			}
 		}
 	}
-	//사용이 끝났으면 큐 삭제
+	//사용이 끝나면 큐 삭제
 	DestroyQueue(&q);
 }
 
-void Print_SpanningTree(GraphType* g) {
+GraphType* Build_SpanningTree(GraphType* g) { //parent[]를 이용하여 그래프 g의 스패닝 트리를 만들어 반환한다
+	GraphType* spanningTree = CreateGraph();
+	spanningTree->totalVertices = g->totalVertices;
 	for (int i = 0; i < g->totalVertices; i++) {
 		if (parent[i] != -1) { //부모노드가 존재하는 경우만
-			printf("(%d, %d)\n", parent[i], i);
+			InsertEdge(spanningTree, i, parent[i]); //i와 parent[i]는 서로 인접정점. 즉 간선 (i, parent[i])가 존재한다
 		}
 	}
+	return spanningTree;
 }
 
 int main() {
@@ -200,20 +177,22 @@ int main() {
 	InsertEdge(g, 3, 4);
 
 	//그래프 출력
-	Print_adjList(g);
+	Print_adjMat(g);
 
 	//bfs
 	Init(); //visited 배열 FALSE로 초기화
 	for (int i = 0; i < MAX_VERTICES; i++) //parent 배열 -1로 초기화
 		parent[i] = -1;
 	printf("<< 너비 우선 탐색 >>\n");
-	BFS_list(g, 0);//0을 시작정점으로 깊이 우선 탐색
+	BFS_mat(g, 0);//0을 시작정점으로 깊이 우선 탐색
 	printf("\n");
-	printf("신장트리 간선들 출력: \n");
-	Print_SpanningTree(g);
+	printf("그래프 g의 신장트리: \n");
+	GraphType* spanningTree = Build_SpanningTree(g);
+	Print_adjMat(spanningTree);
 
 	//그래프 삭제
 	DestroyGraph(&g);
+	DestroyGraph(&spanningTree);
 
 	return 0;
 }
