@@ -1,6 +1,6 @@
 //무방향 그래프, 인접 리스트 방식으로 구현
 //1차원 배열 + 연결리스트 사용
-//DFS 알고리즘(명시적 스택 사용)
+//DFS를 수행하면서 사용한 간선들을 모아 스패닝트리를 만든다
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@ typedef struct {
 }Edge;
 
 int visited[MAX_VERTICES]; //정점 방문 표시할 배열
-Edge spanningTree[MAX_VERTICES]; //신장트리 간선들을 저장할 배열
+Edge edges[MAX_VERTICES]; //신장트리 간선들을 저장할 배열
 int EdgeCount = 0; //저장된 간선의 개수
 
 void Error(char* message) {
@@ -141,7 +141,7 @@ void Init() { //visited 배열을 모두 0(FALSE)로 초기화
 	}
 }
 
-void DFS_list_iterative(GraphType* g, int v) {//인접 리스트로 표현된 그래프에 대한 깊이 우선 탐색(시작정점: v)
+void DFS_list_iterative(GraphType* g, int v) {//DFS 변형: DFS를 수행하면서 사용한 간선들을 edges[]에 저장한다
 	StackType* s = CreateStack(); //정점들을 저장할 스택 생성
 	Push(s, v); //시작정점인 v를 스택에 우선 삽입
 	while (!IsEmpty(s)) { //스택이 빌때까지 반복
@@ -159,18 +159,22 @@ void DFS_list_iterative(GraphType* g, int v) {//인접 리스트로 표현된 �
 					Push(s, w->vertex);//스택에 삽입(꺼낸 정점의 모든 인접 정점을 스택에 삽입한다)
 				}
 			}
-			if (e.end != -1) spanningTree[EdgeCount++] = e;
+			if (e.end != -1) edges[EdgeCount++] = e;
 		}
 	}
 	//스택 사용이 끝나면 삭제
 	DestroyStack(&s);
 }
 
-void Print_SpanninTree() { //스패닝 트리의 간선들을 출력하는 함수
+GraphType* Build_SpanningTree(GraphType* g) { //edges[]를 이용하여 그래프 g의 신장트리를 만들어 반환한다
+	GraphType* spanningTree = CreateGraph();
+	spanningTree->totalVertices = g->totalVertices;
+
 	for (int i = 0; i < EdgeCount; i++) {
-		printf("(%d, %d)\n", spanningTree[i].start, spanningTree[i].end);
+		Edge e = edges[i];
+		InsertEdge(spanningTree, e.start, e.end);
 	}
-	printf("\n");
+	return spanningTree;
 }
 
 int main() {
@@ -202,11 +206,13 @@ int main() {
 	printf("<< 깊이 우선 탐색 >>\n");
 	DFS_list_iterative(g, 0);//0을 시작정점으로 깊이 우선 탐색
 	printf("\n");
-	printf("신장트리 간선들 출력:\n");
-	Print_SpanninTree();
+	printf("그래프 g의 신장트리:\n");
+	GraphType* spanningTree = Build_SpanningTree(g);
+	Print_adjList(spanningTree);
 
 	//그래프 삭제
 	DestroyGraph(&g);
+	DestroyGraph(&spanningTree);
 
 	return 0;
 }
